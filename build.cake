@@ -32,6 +32,15 @@ Setup(ctx =>
         ArgumentCustomization = args => args.Append("/updateprojectfiles")
     });
     var branchName = gitVersion.BranchName;
+
+    // Information("Configuration             : {0}", configuration);
+    Information("Branch                    : {0}", branchName);
+    Information("Informational      Version: {0}", gitVersion.InformationalVersion);
+    Information("SemVer             Version: {0}", gitVersion.SemVer);
+    Information("AssemblySemVer     Version: {0}", gitVersion.AssemblySemVer);
+    Information("AssemblySemFileVer Version: {0}", gitVersion.AssemblySemFileVer);
+    Information("MajorMinorPatch    Version: {0}", gitVersion.MajorMinorPatch);
+    Information("NuGet              Version: {0}", gitVersion.NuGetVersion); 
 });
 
  ///////////////////////////////////////////////////////////////////////////////
@@ -59,7 +68,6 @@ Task("build")
 Task("release-github")
     .Does(()=>{
 
-        //https://stackoverflow.com/questions/42761777/hide-services-passwords-in-cake-build
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
         var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
         var isPrerelease = gitVersion.SemVer.Contains("alpha");
@@ -77,7 +85,21 @@ Task("release-github")
             "gitreleasemanager",
             parameters 
         );
-    });
+});
+
+Task("nuget")
+    .Does(()=>{
+
+        var version = gitVersion.NuGetVersion;
+        var apiKey = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
+        var parameters = $"push \"../src/FileOperationScheduler/bin/Release/FileOperationScheduler.{version}.nupkg\" --api-key {apiKey} --source \"github\"";
+        DotNetTool(
+            solution,
+            "nuget",
+            parameters 
+        );
+        
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
@@ -90,6 +112,7 @@ Task("default")
 
 Task("release")
     .IsDependentOn("default")
+    .IsDependentOn("nuget")
     .IsDependentOn("release-github")
     ;
 
