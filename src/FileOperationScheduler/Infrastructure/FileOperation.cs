@@ -1,6 +1,6 @@
-using Core;
+using FileOperationScheduler.Core;
 
-namespace Infrastructure;
+namespace FileOperationScheduler.Infrastructure;
 
 public class FileOperation : IFileOperation
 {
