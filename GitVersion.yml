@@ -1,0 +1,11 @@
+assembly-versioning-scheme: MajorMinorPatchTag
+branches:
+  master:
+    is-release-branch: true
+  develop:
+    tag: beta
+    increment: Minor
+  feature:
+    regex: ^issue?[\/-]
+    tag: alpha-{BranchName}
+    increment: Minor
