@@ -91,8 +91,10 @@ Task("nuget")
     .Does(()=>{
 
         var version = gitVersion.NuGetVersion;
-        var apiKey = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
-        var parameters = $"push \"../src/FileOperationScheduler/bin/Release/FileOperationScheduler.{version}.nupkg\" --api-key {apiKey} --source \"github\"";
+        var apiKey  = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
+        var source  = "https://nuget.pkg.github.com/jibedoubleve/index.json";
+        
+        var parameters = $"push \"../src/FileOperationScheduler/bin/Release/FileOperationScheduler.{version}.nupkg\" --api-key {apiKey} --source {source}";
         DotNetTool(
             solution,
             "nuget",
