@@ -1,15 +1,35 @@
-using Core;
+using FileOperationScheduler.Core;
+using FileOperationScheduler.Core.Models;
+using Newtonsoft.Json;
+using System.Collections.Immutable;
 
-namespace Infrastructure;
-public class FileOperationScheduler : IFileOperationScheduler
+namespace FileOperationScheduler.Infrastructure;
+
+internal class FileOperationScheduler : BaseOperationScheduler
 {
-    public Task ExecuteAsync()
+    private readonly string _fullName;
+
+    public FileOperationScheduler(string fullName)
     {
-        throw new NotImplementedException();
+        _fullName = fullName;
     }
 
-    public void Register(IFileOperation operation)
+    protected override void CommitImpl()
     {
-        throw new NotImplementedException();
+        var file = (!File.Exists(_fullName)) ? File.Create(_fullName) : File.OpenRead(_fullName);
+
+        using (file)
+        using (var reader = new StreamReader(file))
+        {
+            var json = reader.ReadToEnd();
+            var op =
+                JsonConvert.DeserializeObject<List<OperationLog>>(json)
+                ?? new List<OperationLog>();
+
+            var operations = new List<IOperation>(op);
+            operations.AddRange(Operations);
+
+            Reset(operations);
+        }
     }
 }
