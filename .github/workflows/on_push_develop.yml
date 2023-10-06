@@ -1,0 +1,24 @@
+# When a pull request is merged (therefore a push), 
+# execute tests and release the packages in GitHub
+name: Release
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Release
+    runs-on: windows-latest
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v1
+      - name: Restore dotnet toolss
+        run: dotnet tool restore
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        env:
+          CAKE_PUBLIC_GITHUB_TOKEN: ${{secrets.CAKE_PUBLIC_GITHUB_TOKEN}}
+          CAKE_PUBLIC_GITHUB_USERNAME: ${{secrets.CAKE_PUBLIC_GITHUB_USERNAME}}
+          NUGET_PUBLIC_GITHUB_USERNAME: ${{secrets.NUGET_PUBLIC_USERNAME}}
+        with:
+          target: relnote
