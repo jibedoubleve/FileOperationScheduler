@@ -14,19 +14,19 @@ internal class FileOperationScheduler : BaseOperationScheduler
     public async Task LoadFileAsync()
     {
         var file       = !File.Exists(_fullName) ? File.Create(_fullName) : File.OpenRead(_fullName);
-        var operations = new List<IOperation>();
+        var operations = new List<IOperationConfiguration>();
 
         await using (file)
         using (var reader = new StreamReader(file))
         {
             var json = await reader.ReadToEndAsync();
             var op =
-                JsonConvert.DeserializeObject<List<Operation>>(json)
-                ?? new List<Operation>();
+                JsonConvert.DeserializeObject<List<OperationConfiguration>>(json)
+                ?? new List<OperationConfiguration>();
 
             operations.AddRange(op);
 
-            SetOperations(operations);
+            AddOperations(operations);
         }
     }
 

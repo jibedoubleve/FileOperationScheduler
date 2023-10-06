@@ -13,12 +13,12 @@ public class SchedulerShould : IDisposable
     private const string FilePattern = "lanceur_operation_log_{0}.json";
     private readonly string _fileName = string.Format(FilePattern, Guid.NewGuid());
 
-    private static List<IOperation> GetRandomOperations(int count)
+    private static List<IOperationConfiguration> GetRandomOperations(int count)
     {
-        var results = new List<IOperation>();
+        var results = new List<IOperationConfiguration>();
         for (var i = 0; i < count; i++)
             results.Add(
-                new Operation() { Name = $"NoOperation_{i}", Parameters = StringHelper.Random }
+                new OperationConfiguration() { Name = $"NoOperation_{i}", Parameters = new() { { "1", "un" } } }
             );
         return results;
     }
@@ -27,7 +27,7 @@ public class SchedulerShould : IDisposable
     public async Task CreateInMemoryBeforeSaving()
     {
         // ARRANGE
-        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        var scheduler  = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
         var operations = GetRandomOperations(4);
 
         var i = 0;
@@ -49,7 +49,7 @@ public class SchedulerShould : IDisposable
     public async Task RetrievePreviouslySavedScheduler()
     {
         // ARRANGE
-        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        var scheduler  = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
         var operations = GetRandomOperations(4);
 
         var i = 0;
@@ -73,7 +73,7 @@ public class SchedulerShould : IDisposable
     public async Task RetrievePreviouslyAndAppendOperation()
     {
         // ARRANGE
-        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        var scheduler  = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
         var operations = GetRandomOperations(4);
 
         var i = 0;
