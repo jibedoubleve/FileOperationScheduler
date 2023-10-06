@@ -9,27 +9,30 @@ internal class FileOperationScheduler : BaseOperationScheduler
 {
     private readonly string _fullName;
 
-    public FileOperationScheduler(string fullName)
-    {
-        _fullName = fullName;
-    }
+    public FileOperationScheduler(string fullName) => _fullName = fullName;
 
-    protected override void CommitImpl()
+    public async Task LoadFileAsync()
     {
-        var file = (!File.Exists(_fullName)) ? File.Create(_fullName) : File.OpenRead(_fullName);
+        var file       = !File.Exists(_fullName) ? File.Create(_fullName) : File.OpenRead(_fullName);
+        var operations = new List<IOperation>();
 
-        using (file)
+        await using (file)
         using (var reader = new StreamReader(file))
         {
-            var json = reader.ReadToEnd();
+            var json = await reader.ReadToEndAsync();
             var op =
-                JsonConvert.DeserializeObject<List<OperationLog>>(json)
-                ?? new List<OperationLog>();
+                JsonConvert.DeserializeObject<List<Operation>>(json)
+                ?? new List<Operation>();
 
-            var operations = new List<IOperation>(op);
-            operations.AddRange(Operations);
+            operations.AddRange(op);
 
-            Reset(operations);
+            SetOperations(operations);
         }
+    }
+
+    public override async Task SavePlanAsync()
+    {
+        var json = JsonConvert.SerializeObject(Operations);
+        await File.WriteAllTextAsync(_fullName, json);
     }
 }

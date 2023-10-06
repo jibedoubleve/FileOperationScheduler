@@ -1,85 +1,107 @@
+using System.Reflection.PortableExecutable;
 using FileOperationScheduler.Core;
+using FileOperationScheduler.Core.Models;
 using FileOperationScheduler.Infrastructure;
+using FileOperationScheduler.Test.Helpers;
 using FluentAssertions;
 using Moq;
 
 namespace FileOperationScheduler.Test.SystemTests;
 
-public class SchedulerShould
+public class SchedulerShould : IDisposable
 {
-    [Fact]
-    public void CreateSchedulerFromTempFile()
+    private const string FilePattern = "lanceur_operation_log_{0}.json";
+    private readonly string _fileName = string.Format(FilePattern, Guid.NewGuid());
+
+    private static List<IOperation> GetRandomOperations(int count)
     {
-        // ARRANGE
-        var scheduler = OperationSchedulerFactory.RetrieveFromTempFile();
-        var operations = new List<Mock<IOperation>>() { new(), new(), new() };
-
-        var i = 0;
-
-        // ACT
-        var state = scheduler.AddOperation(operations[i++].Object)
-                             .AddOperation(operations[i++].Object)
-                             .AddOperation(operations[i++].Object)
-                             .SavePlan()
-                             .GetState();
-
-        // ASSERT
-        state.OperationCount
-             .Should()
-             .Be(3);
+        var results = new List<IOperation>();
+        for (var i = 0; i < count; i++)
+            results.Add(
+                new Operation() { Name = $"NoOperation_{i}", Parameters = StringHelper.Random }
+            );
+        return results;
     }
 
     [Fact]
-    public void RetrievePreviouslySavedScheduler()
+    public async Task CreateInMemoryBeforeSaving()
     {
         // ARRANGE
-        var scheduler = OperationSchedulerFactory.RetrieveFromTempFile();
-        var operations = new List<Mock<IOperation>>() { new(), new(), new() };
+        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        var operations = GetRandomOperations(4);
 
         var i = 0;
 
         // ACT
         scheduler.ResetPlan()
-                 .AddOperation(operations[i++].Object)
-                 .AddOperation(operations[i++].Object)
-                 .AddOperation(operations[i++].Object)
-                 .SavePlan()
-                 .GetState();
-        
+                 .AddOperation(operations[i++])
+                 .AddOperation(operations[i++])
+                 .AddOperation(operations[i++]);
+
         // ASSERT
-        var retrieved = OperationSchedulerFactory.RetrieveFromTempFile();
+        scheduler.GetState()
+                 .OperationCount
+                 .Should()
+                 .Be(3);
+    }
+
+    [Fact]
+    public async Task RetrievePreviouslySavedScheduler()
+    {
+        // ARRANGE
+        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        var operations = GetRandomOperations(4);
+
+        var i = 0;
+
+        // ACT
+        await scheduler.ResetPlan()
+                       .AddOperation(operations[i++])
+                       .AddOperation(operations[i++])
+                       .AddOperation(operations[i++])
+                       .SavePlanAsync();
+
+        // ASSERT
+        var retrieved = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
         retrieved.GetState()
                  .OperationCount
                  .Should()
                  .Be(3);
-    } 
-    
+    }
+
     [Fact]
-    public void RetrievePreviouslyAndAppendOperation()
+    public async Task RetrievePreviouslyAndAppendOperation()
     {
         // ARRANGE
-        var scheduler = OperationSchedulerFactory.RetrieveFromTempFile();
-        var operations = new List<Mock<IOperation>>() { new(), new(), new(), new() };
+        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        var operations = GetRandomOperations(4);
 
         var i = 0;
 
         // ACT
-        scheduler.ResetPlan()
-                 .AddOperation(operations[i++].Object)
-                 .AddOperation(operations[i++].Object)
-                 .AddOperation(operations[i++].Object)
-                 .SavePlan()
-                 .GetState();
-        
-        var scheduler2 = OperationSchedulerFactory.RetrieveFromTempFile();
-        scheduler2.AddOperation(operations[i++].Object);
+        await scheduler.ResetPlan()
+                       .AddOperation(operations[i++])
+                       .AddOperation(operations[i++])
+                       .AddOperation(operations[i++])
+                       .SavePlanAsync();
 
-        var retrieved = OperationSchedulerFactory.RetrieveFromTempFile();
-        
+        var scheduler2 = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+        await scheduler2.AddOperation(operations[i++])
+                        .SavePlanAsync();
+
+        var retrieved = await OperationSchedulerFactory.RetrieveFromFileAsync(_fileName);
+
         // ASSERT
         retrieved.GetState()
                  .OperationCount
                  .Should()
                  .Be(4);
+    }
+
+    public void Dispose()
+    {
+        if (!File.Exists(_fileName)) return;
+
+        File.Delete(_fileName);
     }
 }

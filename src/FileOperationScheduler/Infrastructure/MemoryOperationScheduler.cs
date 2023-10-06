@@ -1,8 +1,8 @@
+using FileOperationScheduler.Core;
+
 namespace FileOperationScheduler.Infrastructure;
 
 internal class MemoryOperationScheduler : BaseOperationScheduler
 {
-    protected override void CommitImpl()
-    {
-    }
+    public override Task SavePlanAsync() => Task.CompletedTask;
 }

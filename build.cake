@@ -6,6 +6,8 @@
 
 #addin nuget:?package=Cake.Figlet&version=2.0.1
 
+#tool nuget:?package=GitVersion.CommandLine&version=5.10.1
+
  ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,14 +57,39 @@ Task("clean")
                             .Concat(GetDirectories("./**/Output"))
                             .Concat(GetDirectories("./**/Publish"));
         DeleteDirectories(dirToDelete, new DeleteDirectorySettings{ Recursive = true, Force = true});
+
+        DotNetTool(
+            solution,
+            "clean"
+        );
+});
+
+Task("restore")
+    .Does(()=>{
+
+        DotNetTool(
+            solution,
+            "restore"
+        );
 });
 
 Task("build")
-    .Does(() => {  
-        var settings = new DotNetBuildSettings {
-            Configuration = "release"
-        };
-        DotNetBuild(solution, settings);        
+    .Does(() => {        
+        DotNetTool(
+            solution,
+            "build",
+            "--no-restore -c release"
+        );
+});
+
+Task("test")
+    .Does(()=>{
+
+        DotNetTool(
+            solution,
+            "test",
+            "--no-restore --no-build -c release"
+        );
 });
 
 Task("release-github")
@@ -70,7 +97,9 @@ Task("release-github")
 
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
         var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
-        var isPrerelease = gitVersion.SemVer.Contains("alpha");
+
+        var alphaVersions = new[] { "alpha", "beta" };
+        var isPrerelease = alphaVersions.Any(x => gitVersion.SemVer.Contains(x));
 
         if(isPrerelease) {
                 Information("This is a prerelease");
@@ -91,10 +120,13 @@ Task("nuget")
     .Does(()=>{
 
         var version = gitVersion.NuGetVersion;
-        var apiKey  = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
-        var source  = "https://nuget.pkg.github.com/jibedoubleve/index.json";
+        var apiKey  = EnvironmentVariable("NUGET_TOKEN");
+        var source  = "https://api.nuget.org/v3/index.json";
         
         var parameters = $"push \"../src/FileOperationScheduler/bin/Release/FileOperationScheduler.{version}.nupkg\" --api-key {apiKey} --source {source}";
+
+        Warning("Parameters: {0}", parameters);
+
         DotNetTool(
             solution,
             "nuget",
@@ -109,13 +141,19 @@ Task("nuget")
 
 Task("default")
     .IsDependentOn("clean")
+    .IsDependentOn("restore")
     .IsDependentOn("build")
+    .IsDependentOn("test")
+    ;
+
+Task("relnote")
+    .IsDependentOn("default")
+    .IsDependentOn("release-github")
     ;
 
 Task("release")
-    .IsDependentOn("default")
+    .IsDependentOn("relnote")
     .IsDependentOn("nuget")
-    .IsDependentOn("release-github")
     ;
 
 RunTarget(target);

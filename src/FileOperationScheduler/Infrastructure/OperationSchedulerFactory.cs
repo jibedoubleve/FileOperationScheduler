@@ -6,11 +6,10 @@ public static class OperationSchedulerFactory
 {
     public static IOperationScheduler RetrieveFromMemory() => new MemoryOperationScheduler();
 
-    public static IOperationScheduler RetrieveFromFile(string filePath) => new FileOperationScheduler(filePath);
-
-    public static IOperationScheduler RetrieveFromTempFile()
+    public static async Task<IOperationScheduler> RetrieveFromFileAsync(string filePath)
     {
-            var path = Path.Combine(Path.GetTempPath(), "lanceur_operation_log.json");
-            return RetrieveFromFile(path);
+        var scheduler =   new FileOperationScheduler(filePath);
+        await scheduler.LoadFileAsync();
+        return scheduler;
     }
 }
