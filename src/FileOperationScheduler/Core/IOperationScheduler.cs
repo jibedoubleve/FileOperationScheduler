@@ -4,7 +4,7 @@ public interface IOperationScheduler
 {
     IOperationScheduler AddOperation(IOperation operation);
 
-    IOperationScheduler SavePlan();
+    Task SavePlanAsync();
 
     SchedulerState GetState();
 

@@ -406,3 +406,4 @@ tools
 
 # Jetbrain Rider
 .idea
+*.DotSettings.user

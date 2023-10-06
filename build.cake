@@ -57,12 +57,31 @@ Task("clean")
         DeleteDirectories(dirToDelete, new DeleteDirectorySettings{ Recursive = true, Force = true});
 });
 
+Task("restore")
+    .Does(()=>{
+
+        DotNetTool(
+            solution,
+            "restore"
+        );
+});
+
 Task("build")
     .Does(() => {  
         var settings = new DotNetBuildSettings {
             Configuration = "release"
         };
         DotNetBuild(solution, settings);        
+});
+
+Task("test")
+    .Does(()=>{
+
+        DotNetTool(
+            solution,
+            "test",
+            "--no-restore --no-build -c release"
+        );
 });
 
 Task("release-github")
@@ -91,7 +110,7 @@ Task("nuget")
     .Does(()=>{
 
         var version = gitVersion.NuGetVersion;
-        var apiKey  = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
+        var apiKey  = EnvironmentVariable("NUGET_PUBLIC_GITHUB_USERNAME");
         var source  = "https://nuget.pkg.github.com/jibedoubleve/index.json";
         
         var parameters = $"push \"../src/FileOperationScheduler/bin/Release/FileOperationScheduler.{version}.nupkg\" --api-key {apiKey} --source {source}";
@@ -109,13 +128,15 @@ Task("nuget")
 
 Task("default")
     .IsDependentOn("clean")
+    .IsDependentOn("restore")
     .IsDependentOn("build")
+    .IsDependentOn("test")
     ;
 
 Task("release")
     .IsDependentOn("default")
-    .IsDependentOn("nuget")
     .IsDependentOn("release-github")
+    .IsDependentOn("nuget")
     ;
 
 RunTarget(target);
