@@ -403,7 +403,3 @@ tools
 
 # MacOS
 .DS_Store
-
-# Jetbrain Rider
-.idea
-*.DotSettings.user

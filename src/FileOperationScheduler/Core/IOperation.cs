@@ -1,7 +1,6 @@
 namespace FileOperationScheduler.Core;
 
-public interface IOperation
+public interface IOperation : IOperationConfiguration
 {
-    string? Name { get; set; }
-    string? Parameters { get; set; }
+    Task ProcessAsync();
 }

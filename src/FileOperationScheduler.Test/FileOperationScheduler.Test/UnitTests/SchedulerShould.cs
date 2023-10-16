@@ -11,9 +11,9 @@ public class SchedulerShould
     public async Task CreateOperation_WhenSaved()
     {
         // ARRANGE
-        var operation1 = new Mock<IOperation>();
-        var operation2 = new Mock<IOperation>();
-        var operation3 = new Mock<IOperation>();
+        var operation1 = new Mock<IOperationConfiguration>();
+        var operation2 = new Mock<IOperationConfiguration>();
+        var operation3 = new Mock<IOperationConfiguration>();
 
         // ACT
         var scheduler = OperationSchedulerFactory.RetrieveFromMemory();

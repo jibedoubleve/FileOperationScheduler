@@ -10,7 +10,7 @@
 // Retrieve an operation scheduler from a default location
 // If the file doesn't exist, it'll create one and put default
 // values (i.e. no value)
-var opScheduler = OperationSchedulerFactory.FromTempFile();
+var opScheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(fileName);
 
 // Plan the actions to execute.
 // Calling `Commit()` will save the operation
@@ -22,10 +22,12 @@ var opZip = OperationFactory.Unzip(zip, destination);
 
 opScheduler.AddOperation(opDir)
            .AddOperation(opZip)
-           .Commit();
+           .SavePlanAsync();
 
 // Later, after either the machine or the application 
-// have been restarted, call ProcessOperations()
+// have been restarted, call ExecutePlanAsync()
 // to execute the operations
-await opScheduler.ProcessAsync();
+
+var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(fileName);
+await scheduler.ExecutePlanAsync();
 ```
