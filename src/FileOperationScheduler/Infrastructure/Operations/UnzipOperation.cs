@@ -6,9 +6,21 @@ namespace FileOperationScheduler.Infrastructure.Operations;
 [Operation("unzip")]
 internal class UnzipOperation : BaseOperation, IOperation
 {
-    public UnzipOperation(Dictionary<string, string> parameters) : base("unzip", parameters)
-    {
-    }
+    #region Private members
+
+    private string ArchiveFile => Parameters["zip"];
+
+    private string Destination => Parameters["destination"];
+
+    #endregion
+
+    #region Constructors
+
+    public UnzipOperation(Dictionary<string, string> parameters) : base("unzip", parameters) { }
+
+    #endregion
+
+    #region Public methods
 
     public async Task ProcessAsync()
     {
@@ -17,6 +29,5 @@ internal class UnzipOperation : BaseOperation, IOperation
         await Task.Run(() => ZipFile.ExtractToDirectory(ArchiveFile, Destination));
     }
 
-    private string Destination => Parameters["destination"];
-    private string ArchiveFile => Parameters["zip"];
+    #endregion
 }

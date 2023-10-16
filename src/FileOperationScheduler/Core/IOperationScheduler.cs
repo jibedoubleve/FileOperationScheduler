@@ -2,12 +2,16 @@ namespace FileOperationScheduler.Core;
 
 public interface IOperationScheduler
 {
-    IOperationScheduler AddOperation(IOperationConfiguration operationConfiguration);
+    #region Public methods
 
-    Task SavePlanAsync();
+    IOperationScheduler AddOperation(IOperationConfiguration operationConfiguration);
+    Task ExecutePlanAsync();
 
     SchedulerState GetState();
 
     IOperationScheduler ResetPlan();
-    Task ExecutePlanAsync();
+
+    Task SavePlanAsync();
+
+    #endregion
 }

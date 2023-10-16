@@ -2,7 +2,11 @@ namespace FileOperationScheduler.Core;
 
 public interface IOperationConfiguration
 {
-    Dictionary<string, string>  Parameters { get;  }
-    
+    #region Public properties
+
     string Name { get; }
+
+    Dictionary<string, string> Parameters { get; }
+
+    #endregion
 }
