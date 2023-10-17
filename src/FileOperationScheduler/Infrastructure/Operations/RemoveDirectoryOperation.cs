@@ -2,7 +2,6 @@ using FileOperationScheduler.Core;
 
 namespace FileOperationScheduler.Infrastructure.Operations;
 
-[Operation("rmdir")]
 internal class RemoveDirectoryOperation : BaseOperation, IOperation
 {
     #region Constructors

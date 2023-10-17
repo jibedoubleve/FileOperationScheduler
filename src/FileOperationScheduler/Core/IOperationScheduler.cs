@@ -1,10 +1,12 @@
+using FileOperationScheduler.Core.Models;
+
 namespace FileOperationScheduler.Core;
 
 public interface IOperationScheduler
 {
     #region Public methods
 
-    IOperationScheduler AddOperation(IOperationConfiguration operationConfiguration);
+    IOperationScheduler AddOperation(OperationConfiguration operationConfiguration);
     Task ExecutePlanAsync();
 
     SchedulerState GetState();

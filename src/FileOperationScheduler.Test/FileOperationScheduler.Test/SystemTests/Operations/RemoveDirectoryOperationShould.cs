@@ -1,3 +1,4 @@
+using FileOperationScheduler.Infrastructure;
 using FileOperationScheduler.Infrastructure.Operations;
 using FluentAssertions;
 
@@ -19,7 +20,8 @@ public class RemoveDirectoryOperationShould
         var rmdir = OperationFactory.RemoveDirectory(directory);
         Directory.Exists(directory).Should().BeTrue();
 
-        await rmdir.ProcessAsync();
+        await rmdir.AsOperation()
+                   .ProcessAsync();
 
         // ASSERT
         Directory.Exists(directory).Should().BeFalse();

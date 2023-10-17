@@ -1,4 +1,4 @@
-using FileOperationScheduler.Core;
+using FileOperationScheduler.Core.Models;
 using FileOperationScheduler.Infrastructure;
 using FluentAssertions;
 using Moq;
@@ -13,9 +13,9 @@ public class SchedulerShould
     public async Task CreateOperation_WhenSaved()
     {
         // ARRANGE
-        var operation1 = new Mock<IOperationConfiguration>();
-        var operation2 = new Mock<IOperationConfiguration>();
-        var operation3 = new Mock<IOperationConfiguration>();
+        var operation1 = new Mock<OperationConfiguration>();
+        var operation2 = new Mock<OperationConfiguration>();
+        var operation3 = new Mock<OperationConfiguration>();
 
         // ACT
         var scheduler = OperationSchedulerFactory.RetrieveFromMemory();

@@ -1,10 +1,10 @@
 namespace FileOperationScheduler.Core.Models;
 
-public class OperationConfiguration : IOperationConfiguration
+public class OperationConfiguration
 {
     #region Public properties
 
-    public string Name { get; set; } = "noop";
+    public string? Name { get; init; }
     public Dictionary<string, string> Parameters { get; set; } = new();
 
     #endregion
