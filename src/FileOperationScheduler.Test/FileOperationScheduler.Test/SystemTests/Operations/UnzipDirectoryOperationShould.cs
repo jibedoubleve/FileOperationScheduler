@@ -1,3 +1,4 @@
+using FileOperationScheduler.Infrastructure;
 using FileOperationScheduler.Infrastructure.Operations;
 using FileOperationScheduler.Test.Helpers;
 using FluentAssertions;
@@ -60,7 +61,8 @@ public class UnzipDirectoryOperationShould : IDisposable
     {
         // ACT
         var unzipDir = OperationFactory.UnzipDirectory(ArchiveFile, Destination);
-        await unzipDir.ProcessAsync();
+        await unzipDir.AsOperation()
+                      .ProcessAsync();
 
         // ASSERT
         var path = Path.Combine(Destination, TextFileName);

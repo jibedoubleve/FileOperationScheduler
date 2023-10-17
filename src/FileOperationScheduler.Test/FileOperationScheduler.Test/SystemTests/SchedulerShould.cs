@@ -1,4 +1,3 @@
-using FileOperationScheduler.Core;
 using FileOperationScheduler.Core.Models;
 using FileOperationScheduler.Infrastructure;
 using FluentAssertions;
@@ -13,9 +12,9 @@ public class SchedulerShould : IDisposable
 
     private const string FilePattern = "lanceur_operation_log_{0}.json";
 
-    private static List<IOperationConfiguration> GetRandomOperations(int count)
+    private static List<OperationConfiguration> GetRandomOperations(int count)
     {
-        var results = new List<IOperationConfiguration>();
+        var results = new List<OperationConfiguration>();
         for (var i = 0; i < count; i++)
             results.Add(
                 new OperationConfiguration

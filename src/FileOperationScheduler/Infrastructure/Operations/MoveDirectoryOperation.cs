@@ -2,12 +2,12 @@ using FileOperationScheduler.Core;
 
 namespace FileOperationScheduler.Infrastructure.Operations;
 
-[Operation("mvdir")]
 internal class MoveDirectoryOperation : BaseOperation, IOperation
 {
     #region Constructors
 
-    public MoveDirectoryOperation(Dictionary<string, string> parameters) : base("mvdir", parameters) { }
+    public MoveDirectoryOperation(Dictionary<string, string> parameters)
+        : base(typeof(MoveDirectoryOperation).FullName!, parameters) { }
 
     #endregion
 

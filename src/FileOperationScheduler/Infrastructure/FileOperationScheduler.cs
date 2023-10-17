@@ -1,4 +1,3 @@
-using FileOperationScheduler.Core;
 using FileOperationScheduler.Core.Models;
 using Newtonsoft.Json;
 
@@ -23,7 +22,7 @@ internal class FileOperationScheduler : BaseOperationScheduler
     public async Task LoadFileAsync()
     {
         var file = !File.Exists(_fullName) ? File.Create(_fullName) : File.OpenRead(_fullName);
-        var operations = new List<IOperationConfiguration>();
+        var operations = new List<OperationConfiguration>();
 
         await using (file)
         using (var reader = new StreamReader(file))

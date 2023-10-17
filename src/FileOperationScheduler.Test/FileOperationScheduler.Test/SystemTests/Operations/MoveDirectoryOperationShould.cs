@@ -1,3 +1,4 @@
+using FileOperationScheduler.Infrastructure;
 using FileOperationScheduler.Infrastructure.Operations;
 using FluentAssertions;
 
@@ -49,7 +50,8 @@ public class MoveDirectoryOperationShould : IDisposable
     {
         // ACT
         var moveDirectory = OperationFactory.MoveDirectory(Source, Destination);
-        await moveDirectory.ProcessAsync();
+        await moveDirectory.AsOperation()
+                           .ProcessAsync();
 
         // ASSERT
         Directory.Exists(Destination)

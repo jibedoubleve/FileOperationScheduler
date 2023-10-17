@@ -1,5 +1,6 @@
 using System.Reflection;
 using FileOperationScheduler.Core;
+using FileOperationScheduler.Core.Models;
 using FileOperationScheduler.Infrastructure.Operations;
 
 namespace FileOperationScheduler.Infrastructure;
@@ -8,38 +9,18 @@ public abstract class BaseOperationScheduler : IOperationScheduler
 {
     #region Private members
 
-    private readonly List<IOperationConfiguration> _operations = new();
+    private readonly List<OperationConfiguration> _operations = new();
 
-    private static IEnumerable<IOperation> GetOperations(List<IOperationConfiguration> operations)
+    private static IEnumerable<IOperation> GetOperations(List<OperationConfiguration> configurations)
     {
-        var ops = new List<IOperation>();
-
-        foreach (var operation in operations)
-        {
-            var type =
-                (from t in Types
-                 where t.GetCustomAttributes<OperationAttribute>(true)
-                        .Any(x => x.Name == operation.Name)
-                 select t).FirstOrDefault();
-
-            if (type is null) throw new NotSupportedException($"Cannot find operation '{operation.Name}'");
-
-            var o = (IOperation)Activator.CreateInstance(type, operation.Parameters)!;
-            ops.Add(o);
-        }
-
-        return ops;
+        return configurations.Select(cfg => cfg.AsOperation()).ToList();
     }
-
-    private static readonly IEnumerable<Type> Types =
-        Assembly.GetAssembly(typeof(BaseOperation))?.GetTypes()
-        ?? Type.EmptyTypes;
 
     #endregion
 
     #region Public methods
 
-    public IOperationScheduler AddOperation(IOperationConfiguration operationConfiguration)
+    public IOperationScheduler AddOperation(OperationConfiguration operationConfiguration)
     {
         _operations.Add(operationConfiguration);
         return this;
@@ -64,9 +45,9 @@ public abstract class BaseOperationScheduler : IOperationScheduler
 
     #endregion
 
-    protected IEnumerable<IOperationConfiguration> Operations => _operations.ToArray();
+    protected IEnumerable<OperationConfiguration> Operations => _operations.ToArray();
 
-    protected IOperationScheduler AddOperations(IEnumerable<IOperationConfiguration> operations, bool resetList = true)
+    protected IOperationScheduler AddOperations(IEnumerable<OperationConfiguration> operations, bool resetList = true)
     {
         if (resetList) _operations.Clear();
 

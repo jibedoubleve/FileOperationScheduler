@@ -1,4 +1,4 @@
-using FileOperationScheduler.Core;
+using FileOperationScheduler.Core.Models;
 
 namespace FileOperationScheduler.Infrastructure.Operations;
 
@@ -6,33 +6,45 @@ public static class OperationFactory
 {
     #region Public methods
 
-    public static IOperation MoveDirectory(string source, string destination)
+    public static OperationConfiguration MoveDirectory(string source, string destination)
     {
         var parameters = new Dictionary<string, string>
         {
             { "source", source },
             { "destination", destination }
         };
-        return new MoveDirectoryOperation(parameters);
+        return new OperationConfiguration
+        {
+            Parameters = parameters,
+            Name = typeof(MoveDirectoryOperation).FullName!
+        };
     }
 
-    public static IOperation RemoveDirectory(string directory)
+    public static OperationConfiguration RemoveDirectory(string directory)
     {
         var parameters = new Dictionary<string, string>
         {
             { "directory", directory }
         };
-        return new RemoveDirectoryOperation(parameters);
+        return new OperationConfiguration
+        {
+            Name = typeof(RemoveDirectoryOperation).FullName!,
+            Parameters = parameters
+        };
     }
 
-    public static IOperation UnzipDirectory(string zipFile, string destination)
+    public static OperationConfiguration UnzipDirectory(string zipFile, string destination)
     {
         var parameters = new Dictionary<string, string>
         {
             { "zip", zipFile },
             { "destination", destination }
         };
-        return new UnzipOperation(parameters);
+        return new OperationConfiguration
+        {
+            Parameters = parameters,
+            Name = typeof(UnzipOperation).FullName!
+        };
     }
 
     #endregion

@@ -1,7 +1,13 @@
 namespace FileOperationScheduler.Core;
 
-public interface IOperation : IOperationConfiguration
+public interface IOperation
 {
+    #region Public properties
+
+    public Dictionary<string, string> Parameters { get; }
+
+    #endregion
+
     #region Public methods
 
     Task ProcessAsync();

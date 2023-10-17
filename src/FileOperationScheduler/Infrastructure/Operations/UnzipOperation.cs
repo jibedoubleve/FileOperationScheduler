@@ -3,7 +3,6 @@ using FileOperationScheduler.Core;
 
 namespace FileOperationScheduler.Infrastructure.Operations;
 
-[Operation("unzip")]
 internal class UnzipOperation : BaseOperation, IOperation
 {
     #region Private members
