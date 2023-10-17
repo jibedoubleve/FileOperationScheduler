@@ -5,9 +5,13 @@ namespace FileOperationScheduler.Infrastructure.Operations;
 [Operation("rmdir")]
 internal class RemoveDirectoryOperation : BaseOperation, IOperation
 {
-    public RemoveDirectoryOperation(Dictionary<string, string> parameters) : base("rmdir", parameters)
-    {
-    }
+    #region Constructors
+
+    public RemoveDirectoryOperation(Dictionary<string, string> parameters) : base("rmdir", parameters) { }
+
+    #endregion
+
+    #region Public methods
 
     public Task ProcessAsync()
     {
@@ -17,4 +21,6 @@ internal class RemoveDirectoryOperation : BaseOperation, IOperation
         Directory.Delete(directory, true);
         return Task.CompletedTask;
     }
+
+    #endregion
 }

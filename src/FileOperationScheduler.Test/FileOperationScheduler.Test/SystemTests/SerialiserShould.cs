@@ -4,19 +4,38 @@ using FileOperationScheduler.Test.Helpers;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
-using Newtonsoft;
 
 namespace FileOperationScheduler.Test.SystemTests;
 
 public class SerialiserShould : IDisposable
 {
+    #region Private members
+
     private readonly string _destinationDir = Path.Combine(Path.GetTempPath(), "destination");
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "toRemove");
 
     private readonly string _jsonFile = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.json");
-    private readonly string _zipFile = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.zip");
 
     private readonly ITestOutputHelper _output;
+    private readonly string _zipFile = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.zip");
+
+    private void OutputJsonFile()
+    {
+        if (!File.Exists(_jsonFile))
+        {
+            _output.WriteLine($"File '{_jsonFile}' does not exist.");
+            return;
+        }
+
+        var json = File.ReadAllText(_jsonFile);
+        json = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(json), Formatting.Indented);
+        _output.WriteLine("Json configuration file contains:");
+        _output.WriteLine(json);
+    }
+
+    #endregion
+
+    #region Constructors
 
     public SerialiserShould(ITestOutputHelper output)
     {
@@ -27,6 +46,35 @@ public class SerialiserShould : IDisposable
         _output.WriteLine($"Directory      : {_directory}");
     }
 
+    #endregion
+
+    #region Public methods
+
+    [Fact]
+    public async Task Deserialize()
+    {
+        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_jsonFile);
+
+        Directory.CreateDirectory(_destinationDir);
+
+        await scheduler.AddOperation(OperationFactory.RemoveDirectory(_destinationDir))
+                       .AddOperation(OperationFactory.UnzipDirectory(_zipFile, _destinationDir))
+                       .SavePlanAsync();
+
+        var deserializedScheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_jsonFile);
+        deserializedScheduler.GetState()
+                             .OperationCount
+                             .Should().Be(2);
+    }
+
+    public void Dispose()
+    {
+        if (File.Exists(_jsonFile)) File.Delete(_jsonFile);
+        if (File.Exists(_zipFile)) File.Delete(_zipFile);
+
+        if (Directory.Exists(_destinationDir)) Directory.Delete(_destinationDir, true);
+        if (Directory.Exists(_directory)) Directory.Delete(_directory, true);
+    }
 
     [Fact]
     public async Task Serialize()
@@ -63,43 +111,5 @@ public class SerialiserShould : IDisposable
                  .Should().BeGreaterThan(0);
     }
 
-    [Fact]
-    public async Task Deserialize()
-    {
-        var scheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_jsonFile);
-
-        Directory.CreateDirectory(_destinationDir);
-
-        await scheduler.AddOperation(OperationFactory.RemoveDirectory(_destinationDir))
-                       .AddOperation(OperationFactory.UnzipDirectory(_zipFile, _destinationDir))
-                       .SavePlanAsync();
-
-        var deserializedScheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_jsonFile);
-        deserializedScheduler.GetState()
-                             .OperationCount
-                             .Should().Be(2);
-    }
-
-    private void OutputJsonFile()
-    {
-        if (!File.Exists(_jsonFile))
-        {
-            _output.WriteLine($"File '{_jsonFile}' does not exist.");
-            return;
-        }
-
-        var json = File.ReadAllText(_jsonFile);
-        json = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(json), Formatting.Indented);
-        _output.WriteLine("Json configuration file contains:");
-        _output.WriteLine(json);
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_jsonFile)) File.Delete(_jsonFile);
-        if (File.Exists(_zipFile)) File.Delete(_zipFile);
-
-        if (Directory.Exists(_destinationDir)) Directory.Delete(_destinationDir, true);
-        if (Directory.Exists(_directory)) Directory.Delete(_directory, true);
-    }
+    #endregion
 }

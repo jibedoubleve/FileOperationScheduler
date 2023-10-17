@@ -2,7 +2,7 @@ namespace FileOperationScheduler.Infrastructure.Operations;
 
 public abstract class BaseOperation
 {
-    public string Name { get; init; }
+    #region Constructors
 
     internal BaseOperation(string name, Dictionary<string, string> parameters)
     {
@@ -10,5 +10,13 @@ public abstract class BaseOperation
         Parameters = parameters;
     }
 
+    #endregion
+
+    #region Public properties
+
+    public string Name { get; init; }
+
     public Dictionary<string, string> Parameters { get; init; }
+
+    #endregion
 }

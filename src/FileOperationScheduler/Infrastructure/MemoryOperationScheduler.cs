@@ -1,8 +1,10 @@
-using FileOperationScheduler.Core;
-
 namespace FileOperationScheduler.Infrastructure;
 
 internal class MemoryOperationScheduler : BaseOperationScheduler
 {
-    public override Task SavePlanAsync() => Task.CompletedTask;
+    #region Public methods
+
+    public override Task SavePlanAsync() { return Task.CompletedTask; }
+
+    #endregion
 }

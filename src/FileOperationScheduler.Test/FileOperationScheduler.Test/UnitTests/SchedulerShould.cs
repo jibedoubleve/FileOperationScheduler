@@ -7,6 +7,8 @@ namespace FileOperationScheduler.Test.UnitTests;
 
 public class SchedulerShould
 {
+    #region Public methods
+
     [Fact]
     public async Task CreateOperation_WhenSaved()
     {
@@ -28,4 +30,6 @@ public class SchedulerShould
                  .OperationCount
                  .Should().Be(3);
     }
+
+    #endregion
 }

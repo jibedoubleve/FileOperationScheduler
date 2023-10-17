@@ -1,19 +1,28 @@
 using FileOperationScheduler.Core;
 using FileOperationScheduler.Core.Models;
 using Newtonsoft.Json;
-using System.Collections.Immutable;
 
 namespace FileOperationScheduler.Infrastructure;
 
 internal class FileOperationScheduler : BaseOperationScheduler
 {
+    #region Private members
+
     private readonly string _fullName;
 
-    public FileOperationScheduler(string fullName) => _fullName = fullName;
+    #endregion
+
+    #region Constructors
+
+    public FileOperationScheduler(string fullName) { _fullName = fullName; }
+
+    #endregion
+
+    #region Public methods
 
     public async Task LoadFileAsync()
     {
-        var file       = !File.Exists(_fullName) ? File.Create(_fullName) : File.OpenRead(_fullName);
+        var file = !File.Exists(_fullName) ? File.Create(_fullName) : File.OpenRead(_fullName);
         var operations = new List<IOperationConfiguration>();
 
         await using (file)
@@ -35,4 +44,6 @@ internal class FileOperationScheduler : BaseOperationScheduler
         var json = JsonConvert.SerializeObject(Operations);
         await File.WriteAllTextAsync(_fullName, json);
     }
+
+    #endregion
 }

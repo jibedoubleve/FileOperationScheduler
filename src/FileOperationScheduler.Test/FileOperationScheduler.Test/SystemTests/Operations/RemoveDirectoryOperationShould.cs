@@ -5,6 +5,8 @@ namespace FileOperationScheduler.Test.SystemTests.Operations;
 
 public class RemoveDirectoryOperationShould
 {
+    #region Public methods
+
     [Fact]
     public async Task BeProcessed()
     {
@@ -22,4 +24,6 @@ public class RemoveDirectoryOperationShould
         // ASSERT
         Directory.Exists(directory).Should().BeFalse();
     }
+
+    #endregion
 }

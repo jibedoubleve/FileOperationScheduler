@@ -5,9 +5,13 @@ namespace FileOperationScheduler.Infrastructure.Operations;
 [Operation("mvdir")]
 internal class MoveDirectoryOperation : BaseOperation, IOperation
 {
-    public MoveDirectoryOperation(Dictionary<string, string> parameters) : base("mvdir",parameters)
-    {
-    }
+    #region Constructors
+
+    public MoveDirectoryOperation(Dictionary<string, string> parameters) : base("mvdir", parameters) { }
+
+    #endregion
+
+    #region Public methods
 
     public Task ProcessAsync()
     {
@@ -19,4 +23,6 @@ internal class MoveDirectoryOperation : BaseOperation, IOperation
         Directory.Move(src, dst);
         return Task.CompletedTask;
     }
+
+    #endregion
 }
