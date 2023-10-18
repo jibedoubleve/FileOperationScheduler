@@ -94,7 +94,6 @@ Task("test")
 
 Task("release-github")
     .Does(()=>{
-
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
         var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
 
@@ -107,7 +106,10 @@ Task("release-github")
 
         var parameters = $"create --token {token} -o {owner} -r {repoName} " +
                          $"--milestone {gitVersion.MajorMinorPatch} --name {gitVersion.SemVer} " +
-                         $"--debug --verbose {(isPrerelease ? "--pre" : "")}";
+                         $"{(isPrerelease ? "--pre" : "")} " +
+                         $"--targetDirectory {Environment.CurrentDirectory} "
+                         // + "--debug --verbose"
+                         ;
         
         DotNetTool(
             solution, 
