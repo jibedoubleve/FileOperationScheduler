@@ -19,6 +19,6 @@ jobs:
         env:
           CAKE_PUBLIC_GITHUB_TOKEN: ${{secrets.CAKE_PUBLIC_GITHUB_TOKEN}}
           CAKE_PUBLIC_GITHUB_USERNAME: ${{secrets.CAKE_PUBLIC_GITHUB_USERNAME}}
-          NUGET_PUBLIC_GITHUB_USERNAME: ${{secrets.NUGET_PUBLIC_USERNAME}}
+          NUGET_TOKEN: ${{secrets.NUGET_TOKEN}}
         with:
           target: release
